@@ -88,7 +88,7 @@ Claude settings) to tune behavior:
 | Variable | Default | Purpose |
 |---|---|---|
 | `GIT_WORKFLOW_REQUIRED_CHECKS` | _(empty — hook no-ops)_ | Space- or comma-separated CheckRun names that must be green before `gh pr merge` is allowed. Example: `"Lint Test"`. Only list checks that run on `pull_request` events — jobs gated on `push` will appear MISSING and always block. |
-| `CLAUDE_ALLOW_MAIN_WORK` | unset | When `1`, suppresses `block-commit-on-main` and `block-edits-on-main-or-root`. Use sparingly (e.g., a trivial fix when CI is broken). |
+| `CLAUDE_ALLOW_MAIN_WORK` | unset | When `1`, suppresses `block-commit-on-main` and `block-edits-on-main-or-root`. Use sparingly (e.g., a trivial fix when CI is broken). `CLAUDE_ALLOW_MAIN_COMMIT=1` is accepted as a legacy alias for the commit hook only. |
 | `CLAUDE_ALLOW_RED_MERGE` | unset | When `1` (typically as an inline assignment, e.g. `CLAUDE_ALLOW_RED_MERGE=1 gh pr merge 42`), suppresses `block-merge-on-red-ci` for one command. Use only when a failing check is genuinely unrelated infra. |
 | `CLAUDE_CODE_REMOTE` | _(set automatically by Claude Code on the web)_ | When `true`, the worktree-aware hooks (`block-checkout-on-root`, `block-commit-on-main`, `block-edits-on-main-or-root`) skip — there are no worktrees in the web environment, so the guards would only produce false positives. |
 

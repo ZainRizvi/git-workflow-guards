@@ -19,16 +19,15 @@ git_dir=$(git rev-parse --git-dir 2>/dev/null)
 # Strip --delete-branch and clean up whitespace
 new_cmd=$(echo "$cmd" | sed 's/--delete-branch//g' | sed 's/  */ /g; s/^ *//; s/ *$//')
 
-cat <<EOF
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "updatedInput": {
-      "command": "$new_cmd"
-    },
-    "additionalContext": "Removed --delete-branch because you are in a worktree. Deleting the branch would break this worktree. Let the worktree manager handle branch cleanup."
+# Use jq for JSON encoding so a command containing quotes, backslashes, or
+# newlines (e.g. a commit message body inline-quoted into the gh command)
+# can't malform the rewrite payload.
+jq -n --arg cmd "$new_cmd" '{
+  hookSpecificOutput: {
+    hookEventName: "PreToolUse",
+    updatedInput: { command: $cmd },
+    additionalContext: "Removed --delete-branch because you are in a worktree. Deleting the branch would break this worktree. Let the worktree manager handle branch cleanup."
   }
-}
-EOF
+}'
 
 exit 0
