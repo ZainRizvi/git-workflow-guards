@@ -161,8 +161,9 @@ Claude settings) to tune behavior:
 ## Layout
 
 ```
-.claude-plugin/plugin.json    # plugin manifest
-marketplace.json              # marketplace entry (single-plugin repo)
+.claude-plugin/
+  plugin.json                 # plugin manifest
+  marketplace.json            # marketplace entry (single-plugin repo)
 hooks/
   hooks.json                  # event wiring
   *.sh                        # one script per guard
