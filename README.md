@@ -83,7 +83,11 @@ PostToolUse on `Bash`:
 | `/merge-pr` | Squash-merge the PR for the current branch, then watch the merge-commit's CI run on the target branch. |
 | `/fix-github-issue <ref>` | Fetch a GitHub issue, implement the fix, iterate via code review. |
 | `/review` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
-| `/ratchet-harness` | Required when you hit a failure your project's checks should have caught (CI fail, code-review finding, push regression, missed class of mistake). Forces the question "could a lint, structural test, doc note, or skill update have caught this?" *before* you fix the bug, so the project's automated checks only ever grow. |
+| `/ratchet-harness` | Required when you hit a failure your project's checks should have caught (CI fail, code-review finding, push regression, missed class of mistake, recurring scan skips). Forces the question "could a lint, structural test, doc note, ratchet entry, or skill update have caught this?" *before* you fix the bug, so the project's automated checks only ever grow. |
+| `/ratchet-retro` | Periodic retrospective. Scans recent Claude session transcripts in this repo (and its worktrees) for recurring failure patterns, then runs `/ratchet-harness` for each. Use proactively on a schedule (weekly is a good cadence). |
+| `/setup-claude-md` | Create or update `CLAUDE.md` with the standard structure (TDD, Tidy First, Commit Discipline, Code Organisation, Code Design). |
+| `/setup-lefthook` | Detects the project's language/toolchain and generates a minimal `lefthook.yml` for pre-commit gates. |
+| `/setup-repo` | Apply the canonical Claude Code repo configuration (settings, ratchets log, lefthook, CLAUDE.md). Idempotent — safe to re-run. |
 
 ### Multi-agent review
 
@@ -152,6 +156,10 @@ skills/
   fix-github-issue/SKILL.md
   review/SKILL.md             # multi-agent review orchestrator
   ratchet-harness/SKILL.md    # add-the-rule-before-the-fix discipline
+  ratchet-retro/SKILL.md      # periodic transcript retrospective
+  setup-claude-md/SKILL.md    # canonical CLAUDE.md scaffold
+  setup-lefthook/SKILL.md     # lefthook pre-commit configurator
+  setup-repo/SKILL.md         # one-command repo bootstrap
 agents/
   code-reviewer.md            # general bug/quality review
   comment-analyzer.md         # comment accuracy and rot
