@@ -3,7 +3,7 @@
 A Claude Code plugin that catches common `git` and `gh` footguns before they
 land. Blocks the moves you regret, nudges the moves you forget, and ships a
 handful of git skills (`/making-git-commits`, `/rebase`, `/merge-pr`,
-`/fix-github-issue`) plus a multi-agent review skill (`/review-changes`)
+`/fix-github-issue`) plus a multi-agent review skill (`/review`)
 that codify a clean PR workflow.
 
 Drop it into any git repo. The hooks run only when relevant — outside a git
@@ -81,11 +81,11 @@ PostToolUse on `Bash`:
 | `/rebase` | Rebase the current branch onto `origin/main`, anticipate conflicts. |
 | `/merge-pr` | Squash-merge the PR for the current branch, then watch the merge-commit's CI run on the target branch. |
 | `/fix-github-issue <ref>` | Fetch a GitHub issue, implement the fix, iterate via code review. |
-| `/review-changes` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
+| `/review` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
 
 ### Multi-agent review
 
-`/review-changes` orchestrates six specialised review agents (each can also be invoked directly):
+`/review` orchestrates six specialised review agents (each can also be invoked directly):
 
 | Agent | Lens |
 |---|---|
@@ -101,17 +101,17 @@ The skill auto-detects scope (branch diff vs. uncommitted vs. last commit), runs
 Default invocation reviews the current branch's diff against `main`:
 
 ```
-/review-changes
+/review
 ```
 
 Restrict to specific aspects:
 
 ```
-/review-changes tests errors
-/review-changes simplify        # polish pass after a clean review
+/review tests errors
+/review simplify        # polish pass after a clean review
 ```
 
-The six agent prompts are adapted from Anthropic's [`pr-review-toolkit`](https://github.com/anthropics/claude-code-plugins) plugin (with project-specific TypeScript/Sentry references generalised). The iterate-until-clean orchestration loop is added on top so a single `/review-changes` invocation drives the whole review-evaluate-implement-iterate cycle instead of stopping at "agents returned, here's a list."
+The six agent prompts are adapted from Anthropic's [`pr-review-toolkit`](https://github.com/anthropics/claude-code-plugins) plugin (with project-specific TypeScript/Sentry references generalised). The iterate-until-clean orchestration loop is added on top so a single `/review` invocation drives the whole review-evaluate-implement-iterate cycle instead of stopping at "agents returned, here's a list."
 
 ## Configuration
 
@@ -148,7 +148,7 @@ skills/
   rebase/SKILL.md
   merge-pr/SKILL.md
   fix-github-issue/SKILL.md
-  review-changes/SKILL.md     # multi-agent review orchestrator
+  review/SKILL.md     # multi-agent review orchestrator
 agents/
   code-reviewer.md            # general bug/quality review
   comment-analyzer.md         # comment accuracy and rot

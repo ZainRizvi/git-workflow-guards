@@ -1,6 +1,6 @@
 ---
 name: code-simplifier
-description: Use this agent for a deliberate post-review polish pass on a specific diff scope. It simplifies recently modified code for clarity, consistency, and maintainability while preserving exact functionality. Do NOT trigger automatically; invoke explicitly — typically by the /review-changes orchestrator after the review loop converges, or by a user asking for a clarity pass on specific code.\n\nExamples:\n\n<example>
+description: Use this agent for a deliberate post-review polish pass on a specific diff scope. It simplifies recently modified code for clarity, consistency, and maintainability while preserving exact functionality. Do NOT trigger automatically; invoke explicitly — typically by the /review orchestrator after the review loop converges, or by a user asking for a clarity pass on specific code.\n\nExamples:\n\n<example>
 Context: The assistant has just implemented a new feature that adds user authentication to an API endpoint.
 user: "Please add authentication to the /api/users endpoint"
 assistant: "I've implemented the authentication for the /api/users endpoint. Here's the code:"

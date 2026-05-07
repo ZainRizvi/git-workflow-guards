@@ -1,5 +1,5 @@
 ---
-name: review-changes
+name: review
 description: Multi-agent code review of recent changes — launches up to six specialised reviewer sub-agents in parallel (general code review, comments, tests, error handling, type design, simplification), aggregates their findings, implements valid feedback, and iterates until no agent returns valid findings. Use after writing a non-trivial chunk of code, before committing, before opening a PR, or whenever you want a deeper review than a single-agent pass provides.
 argument-hint: "[aspects: code|comments|tests|errors|types|simplify|all]  [parallel|sequential]  [scope: files or 'staged'|'branch']"
 ---
@@ -181,17 +181,17 @@ Output a structured summary the user can scan in 10 seconds:
 
 ```bash
 # Default — all applicable agents, parallel, auto-scope
-/review-changes
+/review
 
 # Specific aspects only
-/review-changes tests errors
+/review tests errors
 
 # Sequential (rare — slower, but easier to follow live)
-/review-changes all sequential
+/review all sequential
 
 # Explicit scope
-/review-changes path/to/dir/
+/review path/to/dir/
 
 # Just simplification (after a clean review)
-/review-changes simplify
+/review simplify
 ```
