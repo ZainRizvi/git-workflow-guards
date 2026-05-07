@@ -24,9 +24,12 @@ cmd=$(echo "$input" | jq -r '.tool_input.command // empty')
 
 # Match `gh pr merge` anywhere in the command (could be after && or in a
 # subshell). Re-uses the segment-splitting approach from
-# block-merge-on-red-ci.sh.
+# block-merge-on-red-ci.sh. The regex allows a leading run of
+# env-var assignments AND/OR known wrapper commands (`time`, `sudo`,
+# `nice`, `ionice`, `stdbuf`) so e.g. `time gh pr merge 42` still
+# triggers the warning.
 splittable=$(echo "$cmd" | sed -E 's/(&&|\|\||[;|&])/\n/g')
-gh_merge_re='^[[:space:]]*(([[:alnum:]_]+=[^[:space:]]+)[[:space:]]+)*gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'
+gh_merge_re='^[[:space:]]*(([[:alnum:]_]+=[^[:space:]]+|time|sudo|nice|ionice|stdbuf)[[:space:]]+)*gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'
 
 found=0
 while IFS= read -r segment; do

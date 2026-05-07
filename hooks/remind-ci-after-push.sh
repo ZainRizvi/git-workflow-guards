@@ -17,6 +17,11 @@ cmd=$(echo "$input" | jq -r '.tool_input.command // empty')
 # assignments (`GIT_COMMITTER_NAME=x git push`). Catches compound forms like
 # `pnpm build && git push` and `git commit -m '...' && git push` that the
 # original anchored-only `^git push` regex missed entirely.
+#
+# Known false-positive: a literal `; git push` inside a quoted string
+# (e.g. `git commit -m 'note; git push later'`) will trigger the
+# reminder. Quote-aware command splitting in shell is fragile; the
+# extra reminder is harmless and very rare in practice.
 PATTERN='(^|[;|&]|&&|\|\|)[[:space:]]*(([[:alnum:]_]+=[^[:space:]]+)[[:space:]]+)*git[[:space:]]+push([[:space:]]|$)'
 if echo "$cmd" | grep -qE "$PATTERN"; then
   cat <<'EOF'

@@ -30,7 +30,18 @@ This skill is the merge of two patterns:
 
 If the user passed explicit files or a scope argument, use that. Otherwise auto-detect:
 
-1. Resolve the repo's default branch: `git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'`. Fall back to `main` only if that command fails (and try `master`/`trunk` as a last resort if no `origin/HEAD`).
+1. Resolve the repo's default branch:
+   ```bash
+   DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+   if [ -z "$DEFAULT_BRANCH" ]; then
+     for cand in main master trunk; do
+       if git rev-parse --verify "origin/$cand" >/dev/null 2>&1; then
+         DEFAULT_BRANCH="$cand"; break
+       fi
+     done
+   fi
+   ```
+   Test the *output* (`-z`), not the exit code — the pipe to `sed` masks `git symbolic-ref`'s non-zero exit when `origin/HEAD` is unset, so checking `$?` would silently leave `DEFAULT_BRANCH` empty.
 2. `git diff "$DEFAULT_BRANCH"...HEAD` — if non-empty, you're on a feature branch; review the branch diff.
 3. Else `git diff` and `git diff --staged` — review uncommitted/staged work.
 4. Else `git show HEAD` — review the most recent commit.
