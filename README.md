@@ -13,15 +13,9 @@ fall through silently.
 
 ## Install
 
-`git-workflow-guards` is distributed as a Claude Code plugin. Add the
-repo as a marketplace and enable the plugin:
+### Recommended: per-repo auto-install (what most users want)
 
-```bash
-claude /plugin marketplace add ZainRizvi/git-workflow-guards
-claude /plugin install git-workflow-guards
-```
-
-Or, edit your `~/.claude/settings.json` directly:
+Check this snippet into your repo's `.claude/settings.json`:
 
 ```json
 {
@@ -32,11 +26,34 @@ Or, edit your `~/.claude/settings.json` directly:
   },
   "enabledPlugins": {
     "git-workflow-guards@git-workflow-guards": true
+  },
+  "env": {
+    "GIT_WORKFLOW_REQUIRED_CHECKS": "Lint"
   }
 }
 ```
 
-To develop locally, point Claude Code at a checkout:
+Commit it. The next time anyone (or any agent) opens the repo with Claude
+Code, the plugin auto-installs and enables — no manual `/plugin install`
+step. This is the killer feature of project-scoped plugin config: every
+contributor gets the same guards on first session, with zero onboarding.
+
+If your project doesn't run a CI check named `Lint`, change
+`GIT_WORKFLOW_REQUIRED_CHECKS` to your check names (space- or
+comma-separated). Leave it empty to disable the merge-blocking hook.
+
+### Alternative: user-level install (just for you)
+
+Add the marketplace to your personal Claude config:
+
+```bash
+claude /plugin marketplace add ZainRizvi/git-workflow-guards
+claude /plugin install git-workflow-guards
+```
+
+### Local development
+
+Point Claude Code at a checkout:
 
 ```bash
 claude --plugin-dir ~/code/git-workflow-guards
@@ -181,6 +198,13 @@ wherever Claude unpacks the plugin without any per-machine path fixup.
 - `python3` — used by `strip-redundant-git-C.sh` and
   `warn-amend-pushed-commits.sh` for quote-aware command parsing; falls
   back to a permissive sed-based heuristic if missing.
+
+## Companion plugins
+
+- [`webapp-toolkit`](https://github.com/ZainRizvi/webapp-toolkit) — opinionated
+  web-app skills (`/frontend-design`, `/dev-browser`, `/paddle-integration`,
+  `/vercel-infrastructure`). Pair with this plugin for the full opinionated
+  agent setup on a web app.
 
 ## License
 
