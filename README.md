@@ -13,7 +13,18 @@ fall through silently.
 
 ## Install
 
-### Recommended: per-repo auto-install (what most users want)
+There are two paths, depending on whether you want the plugin available across all your repos (user-level) or scoped to a specific project (project-level). Either way, the install is **a one-time, per-machine action** — Claude Code does not silently install plugins from a project's settings without the user's explicit say-so.
+
+### User-level (just for you, across all repos)
+
+```bash
+claude plugin marketplace add ZainRizvi/git-workflow-guards
+claude plugin install git-workflow-guards@git-workflow-guards
+```
+
+That's it. The marketplace and plugin are persisted to `~/.claude/`, and every Claude Code session (in any directory) has the plugin enabled.
+
+### Project-level (everyone on a repo gets it)
 
 Check this snippet into your repo's `.claude/settings.json`:
 
@@ -33,23 +44,11 @@ Check this snippet into your repo's `.claude/settings.json`:
 }
 ```
 
-Commit it. The next time anyone (or any agent) opens the repo with Claude
-Code, the plugin auto-installs and enables — no manual `/plugin install`
-step. This is the killer feature of project-scoped plugin config: every
-contributor gets the same guards on first session, with zero onboarding.
+Commit it. When a teammate opens the repo with Claude Code for the first time, Claude Code prompts them to trust the marketplace. One click, and the plugin is enabled for that machine — persistent across sessions, no further prompts.
 
-If your project doesn't run a CI check named `Lint`, change
-`GIT_WORKFLOW_REQUIRED_CHECKS` to your check names (space- or
-comma-separated). Leave it empty to disable the merge-blocking hook.
+If you'd rather not wait for the prompt, the user-level CLI commands above install the same thing immediately.
 
-### Alternative: user-level install (just for you)
-
-Add the marketplace to your personal Claude config:
-
-```bash
-claude /plugin marketplace add ZainRizvi/git-workflow-guards
-claude /plugin install git-workflow-guards
-```
+If your project doesn't run a CI check named `Lint`, change `GIT_WORKFLOW_REQUIRED_CHECKS` to your check names (space- or comma-separated). Leave it empty to disable the merge-blocking hook.
 
 ### Local development
 
