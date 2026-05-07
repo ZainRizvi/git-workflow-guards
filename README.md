@@ -57,6 +57,7 @@ PreToolUse on `Bash`:
 | `block-blanket-git-add.sh` | Blocks `git add -A`, `git add .`, `git commit -a/-am`. List paths explicitly. |
 | `block-commit-on-main.sh` | Blocks `git commit` while on `main`/`master`/`trunk`. Override with `CLAUDE_ALLOW_MAIN_WORK=1`. |
 | `block-merge-on-red-ci.sh` | Blocks `gh pr merge` when required CI checks aren't green. Configure required checks via `GIT_WORKFLOW_REQUIRED_CHECKS` (default: empty → hook is a no-op). Override with `CLAUDE_ALLOW_RED_MERGE=1`. |
+| `warn-on-pr-merge.sh` | Warns (does not block) when the agent invokes `gh pr merge`. Reminder that "merging is a human action" — agents hand off, humans land. Pairs with `block-merge-on-red-ci.sh`, which still hard-blocks the unsafe case. |
 
 PreToolUse on `Edit|Write|MultiEdit|NotebookEdit`:
 

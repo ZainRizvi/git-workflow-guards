@@ -12,7 +12,8 @@
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/warn-amend-pushed-commits.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-blanket-git-add.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-commit-on-main.sh" },
-          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-merge-on-red-ci.sh", "timeout": 30 }
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-merge-on-red-ci.sh", "timeout": 30 },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/warn-on-pr-merge.sh" }
         ]
       },
       {
