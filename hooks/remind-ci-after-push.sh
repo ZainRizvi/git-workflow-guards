@@ -1,6 +1,11 @@
 #!/bin/bash
 # Remind Claude to wait for CI results after git push
 
+if ! command -v jq >/dev/null 2>&1; then
+  echo "WARNING: remind-ci-after-push hook requires jq (not found); skipping reminder" >&2
+  exit 0
+fi
+
 input=$(cat)
 cmd=$(echo "$input" | jq -r '.tool_input.command // empty')
 

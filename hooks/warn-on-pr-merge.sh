@@ -13,6 +13,11 @@
 # reminder and let the call proceed; the resulting transcript line is
 # the audit trail the agent should re-read before continuing.
 
+if ! command -v jq >/dev/null 2>&1; then
+  echo "WARNING: warn-on-pr-merge hook requires jq (not found); skipping reminder" >&2
+  exit 0
+fi
+
 input=$(cat)
 cmd=$(echo "$input" | jq -r '.tool_input.command // empty')
 [[ -z "$cmd" ]] && exit 0

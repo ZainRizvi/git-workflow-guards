@@ -139,6 +139,7 @@ Claude settings) to tune behavior:
 
 ```
 .claude-plugin/plugin.json    # plugin manifest
+marketplace.json              # marketplace entry (single-plugin repo)
 hooks/
   hooks.json                  # event wiring
   *.sh                        # one script per guard
@@ -147,6 +148,14 @@ skills/
   rebase/SKILL.md
   merge-pr/SKILL.md
   fix-github-issue/SKILL.md
+  review-changes/SKILL.md     # multi-agent review orchestrator
+agents/
+  code-reviewer.md            # general bug/quality review
+  comment-analyzer.md         # comment accuracy and rot
+  test-analyzer.md            # behavioural test coverage gaps
+  silent-failure-hunter.md    # suppressed errors, silent fallbacks
+  type-design-analyzer.md     # invariant strength, encapsulation
+  code-simplifier.md          # post-loop polish pass
 ```
 
 Hook commands resolve via `${CLAUDE_PLUGIN_ROOT}`, so the scripts run from

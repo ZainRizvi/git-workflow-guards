@@ -30,9 +30,10 @@ This skill is the merge of two patterns:
 
 If the user passed explicit files or a scope argument, use that. Otherwise auto-detect:
 
-1. `git diff main...HEAD` — if non-empty, you're on a feature branch; review the branch diff.
-2. Else `git diff` and `git diff --staged` — review uncommitted/staged work.
-3. Else `git show HEAD` — review the most recent commit.
+1. Resolve the repo's default branch: `git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'`. Fall back to `main` only if that command fails (and try `master`/`trunk` as a last resort if no `origin/HEAD`).
+2. `git diff "$DEFAULT_BRANCH"...HEAD` — if non-empty, you're on a feature branch; review the branch diff.
+3. Else `git diff` and `git diff --staged` — review uncommitted/staged work.
+4. Else `git show HEAD` — review the most recent commit.
 
 Capture the file list (and the diff text) for the agents.
 
@@ -75,8 +76,15 @@ Issue all selected agent invocations in **a single message with multiple Task to
 
 - The list of changed files
 - The diff (or instructions to fetch it via `git diff`)
-- A pointer to CLAUDE.md / AGENTS.md so they can pick up project conventions
+- A convention pointer (see below)
 - Any user-supplied focus areas
+
+**Convention pointer for the agents.** Several of the agent prompts say "first read CLAUDE.md / AGENTS.md." Tell each agent in the prompt where to look, with this fallback chain:
+
+1. `CLAUDE.md` at the repo root (and any per-directory `CLAUDE.md` files inside the diff scope)
+2. `AGENTS.md` at the repo root
+3. `CONTRIBUTING.md`, `STYLE.md`, or `README.md` for stated conventions
+4. If none of the above exist, the agent should infer conventions from neighbouring source files in the repo and surface "no project conventions found — using language defaults" in its report so the orchestrator can flag it.
 
 Do not run them sequentially unless the user explicitly asked for `sequential` or you have fewer than two applicable agents.
 
@@ -156,7 +164,7 @@ Output a structured summary the user can scan in 10 seconds:
 - **Don't accept agent suggestions that contradict CLAUDE.md.** The agents read CLAUDE.md but they can still misread it. If a suggestion would violate a stated rule, reject it with rationale.
 - **Don't silence agents you don't like.** If an agent keeps flagging the same thing, the right move is either (a) implement it or (b) document why it's not applicable in the rejected list — not (c) drop the agent from future runs.
 - **The exception:** if a PR description makes an explicit consistency claim ("response shape now matches GET/list"), verify that claim field-by-field. A pre-existing deviation becomes in-scope the moment the PR claims to fix it — "pre-existing" stops being a valid filter.
-- **Don't loop forever.** If after three iterations no new positive-impact findings appear, the diff is clean. Report and stop.
+- **Don't loop forever.** Cap the loop at five total iterations. If you reach the cap and the agents are still returning positive-impact findings, stop and surface the remaining findings as deferred TODOs in the report rather than continuing indefinitely. (The expected case is that the loop converges in 1-3 iterations, well below this ceiling.)
 
 ## Quick reference
 

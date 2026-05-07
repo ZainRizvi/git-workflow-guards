@@ -2,6 +2,16 @@
 # Strip --delete-branch from "gh pr merge" when running in a git worktree.
 # Deleting the branch would break the worktree checkout.
 
+if ! command -v jq >/dev/null 2>&1; then
+  echo "WARNING: block-delete-branch-in-worktree hook requires jq (not found); allowing through" >&2
+  exit 0
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "WARNING: block-delete-branch-in-worktree hook requires git (not found); allowing through" >&2
+  exit 0
+fi
+
 input=$(cat)
 cmd=$(echo "$input" | jq -r '.tool_input.command // empty')
 
