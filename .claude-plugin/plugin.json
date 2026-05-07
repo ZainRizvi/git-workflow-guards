@@ -1,11 +1,17 @@
 {
   "name": "git-workflow-guards",
   "version": "0.1.0",
-  "description": "Hooks and skills that catch common git/gh footguns: blanket adds, commits on main, amending pushed commits, merging with red CI, and more. Plus skills for clean commits, rebasing, merging PRs, and fixing GitHub issues.",
+  "description": "Hooks and skills that catch common git/gh footguns: blanket adds, commits on main, amending pushed commits, merging with red CI, and more. Plus skills for clean commits, rebasing, merging PRs, and fixing GitHub issues. Pulls in plugin-embedder transitively so consumers can vendor this plugin into a repo for environments that can't reliably install plugins from marketplaces.",
   "author": {
     "name": "Zain Rizvi",
     "url": "https://github.com/ZainRizvi"
   },
   "homepage": "https://github.com/ZainRizvi/git-workflow-guards",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "plugin-embedder",
+      "marketplace": "plugin-embedder"
+    }
+  ]
 }
