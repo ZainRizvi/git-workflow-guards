@@ -3,8 +3,9 @@
 A Claude Code plugin that catches common `git` and `gh` footguns before they
 land. Blocks the moves you regret, nudges the moves you forget, and ships a
 handful of git skills (`/making-git-commits`, `/rebase`, `/merge-pr`,
-`/fix-github-issue`) plus a multi-agent review skill (`/review`)
-that codify a clean PR workflow.
+`/fix-github-issue`), a multi-agent review skill (`/review`), and a
+ratchet-the-harness skill (`/ratchet-harness`) that codify a clean PR
+workflow.
 
 Drop it into any git repo. The hooks run only when relevant — outside a git
 repo, on commands that don't match, or in environments that opt out, they
@@ -82,6 +83,7 @@ PostToolUse on `Bash`:
 | `/merge-pr` | Squash-merge the PR for the current branch, then watch the merge-commit's CI run on the target branch. |
 | `/fix-github-issue <ref>` | Fetch a GitHub issue, implement the fix, iterate via code review. |
 | `/review` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
+| `/ratchet-harness` | Required when you hit a failure your project's checks should have caught (CI fail, code-review finding, push regression, missed class of mistake). Forces the question "could a lint, structural test, doc note, or skill update have caught this?" *before* you fix the bug, so the project's automated checks only ever grow. |
 
 ### Multi-agent review
 
@@ -148,7 +150,8 @@ skills/
   rebase/SKILL.md
   merge-pr/SKILL.md
   fix-github-issue/SKILL.md
-  review/SKILL.md     # multi-agent review orchestrator
+  review/SKILL.md             # multi-agent review orchestrator
+  ratchet-harness/SKILL.md    # add-the-rule-before-the-fix discipline
 agents/
   code-reviewer.md            # general bug/quality review
   comment-analyzer.md         # comment accuracy and rot
