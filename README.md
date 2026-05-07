@@ -3,7 +3,8 @@
 A Claude Code plugin that catches common `git` and `gh` footguns before they
 land. Blocks the moves you regret, nudges the moves you forget, and ships a
 handful of git skills (`/making-git-commits`, `/rebase`, `/merge-pr`,
-`/fix-github-issue`) that codify a clean PR workflow.
+`/fix-github-issue`) plus a multi-agent review skill (`/review-changes`)
+that codify a clean PR workflow.
 
 Drop it into any git repo. The hooks run only when relevant — outside a git
 repo, on commands that don't match, or in environments that opt out, they
@@ -80,6 +81,37 @@ PostToolUse on `Bash`:
 | `/rebase` | Rebase the current branch onto `origin/main`, anticipate conflicts. |
 | `/merge-pr` | Squash-merge the PR for the current branch, then watch the merge-commit's CI run on the target branch. |
 | `/fix-github-issue <ref>` | Fetch a GitHub issue, implement the fix, iterate via code review. |
+| `/review-changes` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
+
+### Multi-agent review
+
+`/review-changes` orchestrates six specialised review agents (each can also be invoked directly):
+
+| Agent | Lens |
+|---|---|
+| `code-reviewer` | General bug/quality/CLAUDE.md compliance |
+| `comment-analyzer` | Comment accuracy and rot |
+| `test-analyzer` | Behavioural test coverage gaps |
+| `silent-failure-hunter` | Suppressed errors, silent fallbacks |
+| `type-design-analyzer` | Invariant strength, encapsulation |
+| `code-simplifier` | Polish pass — runs after the loop converges |
+
+The skill auto-detects scope (branch diff vs. uncommitted vs. last commit), runs your test suite first, launches the relevant agents in parallel, evaluates findings by impact (High/Medium/Low/None), implements everything with positive impact, and **re-runs the loop** until every agent returns nothing of value. Sub-agents tend to surface only a partial list per pass, so the iterate-to-clean loop is the value-add.
+
+Default invocation reviews the current branch's diff against `main`:
+
+```
+/review-changes
+```
+
+Restrict to specific aspects:
+
+```
+/review-changes tests errors
+/review-changes simplify        # polish pass after a clean review
+```
+
+The six agent prompts are adapted from Anthropic's [`pr-review-toolkit`](https://github.com/anthropics/claude-code-plugins) plugin (with project-specific TypeScript/Sentry references generalised). The iterate-until-clean orchestration loop is added on top so a single `/review-changes` invocation drives the whole review-evaluate-implement-iterate cycle instead of stopping at "agents returned, here's a list."
 
 ## Configuration
 
