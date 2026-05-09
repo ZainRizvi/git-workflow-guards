@@ -3,9 +3,9 @@
 A Claude Code plugin that catches common `git` and `gh` footguns before they
 land. Blocks the moves you regret, nudges the moves you forget, and ships a
 handful of git skills (`/making-git-commits`, `/rebase`, `/merge-pr`,
-`/fix-github-issue`), a multi-agent review skill (`/review`), and a
-ratchet-the-harness skill (`/ratchet-harness`) that codify a clean PR
-workflow.
+`/fix-github-issue`), a multi-agent review skill (`/review`), a
+disciplined refactor skill (`/refactor`), and a ratchet-the-harness skill
+(`/ratchet-harness`) that codify a clean PR workflow.
 
 Drop it into any git repo. The hooks run only when relevant — outside a git
 repo, on commands that don't match, or in environments that opt out, they
@@ -99,6 +99,7 @@ PostToolUse on `Bash`:
 | `/merge-pr` | Squash-merge the PR for the current branch, then watch the merge-commit's CI run on the target branch. |
 | `/fix-github-issue <ref>` | Fetch a GitHub issue, implement the fix, iterate via code review. |
 | `/review` | Multi-agent code review of recent changes — runs up to six specialised reviewer agents in parallel, aggregates findings, implements valid feedback, and **iterates until clean**. See [Multi-agent review](#multi-agent-review) below. |
+| `/refactor` | Disciplined refactoring loop using 20 universal, language-agnostic principles distilled from the top refactoring skills on skillsmp.com. Maps callers, runs tests, then makes one named, behavior-preserving transformation per commit — covering Extract Method, dedup, dead-code deletion, comment-rot pruning, conditional flattening, and more — until smells in scope are addressed. |
 | `/ratchet-harness` | Required when you hit a failure your project's checks should have caught (CI fail, code-review finding, push regression, missed class of mistake, recurring scan skips). Forces the question "could a lint, structural test, doc note, ratchet entry, or skill update have caught this?" *before* you fix the bug, so the project's automated checks only ever grow. |
 | `/ratchet-retro` | Periodic retrospective. Scans recent Claude session transcripts in this repo (and its worktrees) for recurring failure patterns, then runs `/ratchet-harness` for each. Use proactively on a schedule (weekly is a good cadence). |
 | `/setup-claude-md` | Create or update `CLAUDE.md` with the standard structure (TDD, Tidy First, Commit Discipline, Code Organisation, Code Design). |
@@ -172,6 +173,7 @@ skills/
   merge-pr/SKILL.md
   fix-github-issue/SKILL.md
   review/SKILL.md             # multi-agent review orchestrator
+  refactor/SKILL.md           # 20-principle refactoring loop
   ratchet-harness/SKILL.md    # add-the-rule-before-the-fix discipline
   ratchet-retro/SKILL.md      # periodic transcript retrospective
   setup-claude-md/SKILL.md    # canonical CLAUDE.md scaffold
