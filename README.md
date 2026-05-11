@@ -88,6 +88,7 @@ PostToolUse on `Bash`:
 | Hook | What it does |
 |---|---|
 | `remind-ci-after-push.sh` | After `git push`, reminds the agent to poll CI with `gh run watch`. |
+| `remind-pr-update-after-push.sh` | After `git push`, if the current branch already has an OPEN PR, reminds the agent to consider whether the PR title/description should be updated to reflect the full branch diff. No-op when no PR exists for the branch. |
 | `post-merge-watch-deploy.sh` | After `gh pr merge`, reminds the agent to watch the post-merge deploy run on the target branch. |
 
 ### Skills

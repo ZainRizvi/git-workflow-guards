@@ -28,6 +28,7 @@
         "matcher": "Bash",
         "hooks": [
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/remind-ci-after-push.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/remind-pr-update-after-push.sh", "timeout": 10 },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-merge-watch-deploy.sh", "timeout": 10 }
         ]
       }
