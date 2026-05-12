@@ -28,11 +28,11 @@ If a future subvariant is added to this plugin (named `gc-<something>/SKILL.md`)
 git status --porcelain
 ```
 
-If there are uncommitted changes, stop and tell the user. The scans should run against a clean checkout — uncommitted edits would skew `git blame` ages and leave noise in the duplicated-blocks survey.
+If there are uncommitted changes, stop and tell the user to commit or stash first. There is no `--force` override — the scans must run against a clean checkout because uncommitted edits skew `git blame` ages and leave noise in the duplicated-blocks survey.
 
 ### 2. Dispatch each subvariant as a parallel sub-agent
 
-Spawn one sub-agent per subvariant in a single tool-call batch so they run in parallel. Each sub-agent runs the matching skill end-to-end and is responsible for its own filing, summary, and stop conditions.
+Spawn one sub-agent per subvariant by issuing **multiple `Task` tool invocations in a single assistant message** (not back-to-back across turns — that's sequential, not parallel). Each sub-agent runs the matching skill end-to-end and is responsible for its own filing, summary, and stop conditions.
 
 Brief each sub-agent with:
 
@@ -54,7 +54,7 @@ gc-duplicated-blocks:  filed N issues, skipped M candidates
 
 If a sub-agent fell back to a markdown report (no tracker wired up), substitute the report path for the issue count: `gc-stale-todos: wrote gc-findings/stale-todos-<date>.md`.
 
-If a sub-agent failed (errored out, hit a permission prompt, exhausted its budget), print:
+If a sub-agent failed (errored out, hit a permission prompt, exhausted its token budget, timed out, or got stuck in a loop without returning), print:
 
 ```
 gc-<name>: FAILED — <one-line reason>

@@ -53,7 +53,15 @@ Only file an issue when **size ≥ 30 lines** AND **similarity ≥ 80** AND the 
 
 ## Filing each issue
 
-This skill is **tracker-agnostic**. The repo's project tracker may be GitHub Issues (`gh issue create`), Linear, Jira, beads (`bd create`), or a plain markdown report. Detect what the project uses (look for `.beads/`, `gh` auth status, a `LINEAR_API_KEY`, etc.) and emit each finding via that tracker.
+This skill is **tracker-agnostic**. The repo's project tracker may be GitHub Issues (`gh issue create`), Linear, Jira, beads (`bd create`), or a plain markdown report. Detect what the project uses in this priority order and use the first match:
+
+1. `.beads/` directory at the repo root → `bd create`.
+2. `gh auth status` succeeds **and** `gh repo view --json hasIssuesEnabled -q .hasIssuesEnabled` returns `true` → `gh issue create`.
+3. `LINEAR_API_KEY` env var set → Linear API.
+4. `JIRA_API_TOKEN` env var set → Jira API.
+5. None of the above → markdown-report fallback (see below).
+
+Before filing a new issue, **check for an existing GC issue covering the same duplication** (search the tracker for the file paths involved — `bd list --label gc` / `gh issue list --label gc --search "<file_a>"`). If a match exists, skip — don't file duplicates on every weekly run.
 
 The **payload shape** is the same regardless of tracker:
 
@@ -87,10 +95,10 @@ If no tracker is wired up, write the findings to `gc-findings/duplicated-blocks-
 
 ## Workflow
 
-1. **Survey.** Walk the working tree. Build a mental index of files >100 lines, since duplication of >30-line blocks usually lives in larger files.
-2. **Hunt.** Grep for distinctive multi-line patterns — function names that appear in suspicious contexts, repeated string literals, repeated SQL/ORM call shapes. Read both sides of every candidate fully before judging.
-3. **Score and filter.** Apply the guardrails. Aim for **3–10 findings total**. If you find more, prioritize by `size × similarity × cross-distance` and drop the rest.
-4. **File issues.** One per finding via the project's tracker. Print the issue IDs (or report path) as you go.
+1. **Survey.** Walk the working tree and list files larger than 100 lines — duplication of >30-line blocks usually lives in larger files.
+2. **Hunt.** From the surveyed files, extract concrete seeds for grep: function/method signatures, repeated string literals longer than ~40 characters, repeated SQL/ORM call shapes. Grep each seed across the working tree; collisions are candidates. Read both sides of every candidate fully before judging — never paraphrase.
+3. **Filter and score.** Apply the guardrails to drop generated/vendored code, fixtures, scaffolding, type re-exports, and trivial logic. Score each surviving candidate by similarity, size, and distance.
+4. **File issues.** Aim for **3–10 findings total**. If you have more after filtering, prioritise by `size × similarity × cross-distance` and drop the rest. File one issue per surviving finding via the project's tracker. Print the issue IDs (or report path) as you go.
 5. **Stop.** Do not modify any source files. Do not commit anything. Do not open PRs. Your output is only the issues and a final summary printed to stdout.
 
 ## Final summary
@@ -113,6 +121,6 @@ The skip list is itself useful signal — if every run skips the same category, 
 
 - Read files before claiming what they contain. Never paraphrase code from memory.
 - Never modify source files. This skill is read-only on the codebase.
-- Restrict yourself to read-only commands (`grep`, `ls`, `cat`, `find`, `git log`, `git diff`, `git show`) plus the tracker's create command. No `git commit`, no `git push`, no `curl`, no `rm`, no writes to the filesystem outside the tracker call (or the fallback markdown report).
+- Restrict yourself to read-only commands (`grep`, `ls`, `cat`, `find`, `git log`, `git diff`, `git show`) plus the tracker's read+create commands needed for filing and dedupe. For GitHub Issues that means `gh repo view`, `gh issue list`, `gh issue view`, `gh issue create`, `gh label list`, `gh label create --force`. For beads, `bd list`, `bd show`, `bd create`, `bd label add`. No `git commit`, no `git push`, no `curl`, no `rm`, no writes to the filesystem outside the tracker call (or the fallback markdown report).
 - Never open PRs, never commit, never push.
 - If a tracker call fails, print the error and continue with the next finding. Do not retry blindly.

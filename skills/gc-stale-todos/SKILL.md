@@ -58,7 +58,15 @@ Only file an issue when **age ≥ 30 days** AND the marker is specific (per guar
 
 ## Filing each issue
 
-This skill is **tracker-agnostic**. The repo's project tracker may be GitHub Issues (`gh issue create`), Linear, Jira, beads (`bd create`), or a plain markdown report. Detect what the project uses (look for `.beads/`, `gh` auth status, a `LINEAR_API_KEY`, etc.) and emit each finding via that tracker.
+This skill is **tracker-agnostic**. The repo's project tracker may be GitHub Issues (`gh issue create`), Linear, Jira, beads (`bd create`), or a plain markdown report. Detect what the project uses in this priority order and use the first match:
+
+1. `.beads/` directory at the repo root → `bd create`.
+2. `gh auth status` succeeds **and** `gh repo view --json hasIssuesEnabled -q .hasIssuesEnabled` returns `true` → `gh issue create`.
+3. `LINEAR_API_KEY` env var set → Linear API.
+4. `JIRA_API_TOKEN` env var set → Jira API.
+5. None of the above → markdown-report fallback (see below).
+
+Before filing a new issue, **check for an existing GC issue covering the same marker** (search the tracker for the file path or marker text — `bd list --label gc` / `gh issue list --label gc --search "<file>:<line>"`). If a match exists, skip — don't file duplicates on every weekly run.
 
 The **payload shape** is the same regardless of tracker:
 
@@ -91,13 +99,11 @@ If no tracker is wired up, write the findings to `gc-findings/stale-todos-<YYYY-
 
 ## Workflow
 
-1. **Hunt.** Grep the working tree for the four marker types (`TODO`, `FIXME`, `XXX`, `HACK`). Capture file + line for every hit.
-2. **Filter to comments only.** Skip hits inside string literals, test data, fixtures, or generated/vendored directories (per guardrail list).
-3. **Age each surviving hit.** Run `git blame -L <line>,<line> --porcelain -- <file>` for each marker. Read the `author-time` (Unix timestamp), the sha, the `author` line, and the `summary` (commit subject) from the porcelain output. Do **not** use `git log -1 -- <file>` for this — it returns the file's most recent commit, which is misleading: a file touched yesterday in an unrelated area would mark every old TODO in it as "recent." `git blame` is line-accurate; `git log` is file-accurate.
-4. **Apply guardrails 1–8.** Drop anything that doesn't pass.
-5. **Score and rank.** Aim for **3–10 findings total**. If you find more, prioritize by `(age × marker_severity)` where `FIXME`/`HACK` outrank `TODO`/`XXX`. Drop the rest.
-6. **File issues.** One per finding via the project's tracker. Print the issue IDs (or report path) as you go.
-7. **Stop.** Do not modify any source files. Do not delete any TODO markers — even the ones flagged as `delete-as-stale`. Your output is only the issues and a final summary printed to stdout.
+1. **Hunt.** Grep the working tree for the four marker types (`TODO`, `FIXME`, `XXX`, `HACK`). Capture file + line for every hit. For each surviving hit, run `git blame -L <line>,<line> --porcelain -- <file>` and read the `author-time` (Unix timestamp), `sha`, `author`, and `summary` from the porcelain output. Do **not** use `git log -1 -- <file>` — it returns the file's most recent commit, which is misleading: a file touched yesterday would mark every old TODO in it as "recent." `git blame` is line-accurate; `git log` is file-accurate.
+2. **Filter.** Apply guardrails 1–8 — drop hits inside string literals, test fixtures, generated/vendored directories, markers younger than 30 days, vague markers, and markers already linked to a tracker.
+3. **Score.** For each surviving marker compute age, marker type, specificity, and suggested action (`do-the-work` / `gate-and-monitor` / `delete-as-stale`).
+4. **File issues.** Aim for **3–10 findings total**. If you have more after filtering, prioritise by `(age × marker_severity)` where `FIXME`/`HACK` outrank `TODO`/`XXX`. File one issue per surviving finding via the project's tracker. Print the issue IDs (or report path) as you go.
+5. **Stop.** Do not modify any source files. Do not delete any TODO markers — even the ones flagged as `delete-as-stale`. Your output is only the issues and a final summary printed to stdout.
 
 ## Final summary
 
@@ -119,6 +125,6 @@ The skip list is itself useful signal — if every run skips the same category, 
 
 - Read files (and surrounding code) before claiming what a marker means. Never paraphrase from memory.
 - Never modify source files. This skill is read-only on the codebase. Do **not** delete the TODO/FIXME markers, even ones judged stale — that's a separate human decision.
-- Restrict yourself to read-only commands (`grep`, `ls`, `cat`, `find`, `git log`, `git blame`, `git show`, `git diff`) plus the tracker's create command. No `git commit`, no `git push`, no writes to the filesystem outside the tracker call (or the fallback markdown report).
+- Restrict yourself to read-only commands (`grep`, `ls`, `cat`, `find`, `git log`, `git blame`, `git show`, `git diff`) plus the tracker's read+create commands needed for filing and dedupe. For GitHub Issues that means `gh repo view`, `gh issue list`, `gh issue view`, `gh issue create`, `gh label list`, `gh label create --force`. For beads, `bd list`, `bd show`, `bd create`, `bd label add`. No `git commit`, no `git push`, no writes to the filesystem outside the tracker call (or the fallback markdown report).
 - Never open PRs, never commit, never push.
 - If a tracker call fails, print the error and continue with the next finding. Do not retry blindly.
