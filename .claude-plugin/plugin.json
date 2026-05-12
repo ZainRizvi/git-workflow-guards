@@ -1,7 +1,7 @@
 {
   "name": "git-workflow-guards",
-  "version": "0.2.2",
-  "description": "Hooks and skills that catch common git/gh footguns: blanket adds, commits on main, amending pushed commits, merging with red CI, and more. Plus skills for clean commits, rebasing, merging PRs, and fixing GitHub issues.",
+  "version": "0.3.0",
+  "description": "Hooks and skills that catch common git/gh footguns: blanket adds, commits on main, amending pushed commits, merging with red CI, and more. Plus skills for clean commits, rebasing, merging PRs, fixing GitHub issues, and read-only repo-health garbage-collection scans.",
   "author": {
     "name": "Zain Rizvi",
     "url": "https://github.com/ZainRizvi"
