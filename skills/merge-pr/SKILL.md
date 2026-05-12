@@ -7,6 +7,16 @@ user-invokable: true
 
 # Merge PR
 
+## When to invoke
+
+Only when the user has **explicitly asked for a merge** in this turn or earlier in the conversation. Merging is a human action — `gh pr merge --squash` lands code on `main` with destructive blast radius (force-update of refs, side-effects of any `on: push` workflow, public history rewrite if it goes wrong).
+
+Do **not** invoke as a "natural next step" after PR creation, CI going green, or `/review` returning clean. Those produce a PR ready for human review; review and merge are the human's call.
+
+If the original brief said "hand off to human review", "do not merge", or "human-only action", a terse follow-up like `merge?` / `ship it` / `merge if ci green` is **not** authorisation. Re-read the original brief before invoking. If in doubt, post the PR URL and ask explicitly.
+
+## Procedure
+
 1. Wait for the PR's CI checks to pass:
 
 ```bash
