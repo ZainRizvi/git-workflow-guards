@@ -4,8 +4,10 @@ A Claude Code plugin that catches common `git` and `gh` footguns before they
 land. Blocks the moves you regret, nudges the moves you forget, and ships a
 handful of git skills (`/making-git-commits`, `/rebase`, `/merge-pr`,
 `/fix-github-issue`), a multi-agent review skill (`/review`), a
-disciplined refactor skill (`/refactor`), and a ratchet-the-harness skill
-(`/ratchet-harness`) that codify a clean PR workflow.
+disciplined refactor skill (`/refactor`), a ratchet-the-harness skill
+(`/ratchet-harness`), and a set of read-only repo-health garbage-collection
+scans (`/gc-run` dispatches all in parallel; `/gc-stale-todos` and
+`/gc-duplicated-blocks` are also standalone) that codify a clean PR workflow.
 
 Drop it into any git repo. The hooks run only when relevant — outside a git
 repo, on commands that don't match, or in environments that opt out, they
