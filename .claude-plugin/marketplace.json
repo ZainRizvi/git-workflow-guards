@@ -6,9 +6,8 @@
   },
   "metadata": {
     "description": "Hooks and skills that catch common git/gh footguns and codify a clean PR workflow.",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
-  "allowCrossMarketplaceDependenciesOn": ["plugin-embedder"],
   "plugins": [
     {
       "name": "git-workflow-guards",
