@@ -75,7 +75,7 @@ PreToolUse on `Bash`:
 | `block-delete-branch-in-worktree.sh` | Strips `--delete-branch` from `gh pr merge` when CWD is a worktree (deleting would break the worktree checkout). |
 | `warn-amend-pushed-commits.sh` | Blocks `git commit --amend` when HEAD is already on the remote (would force a push). |
 | `block-blanket-git-add.sh` | Blocks `git add -A`, `git add .`, `git commit -a/-am`. List paths explicitly. |
-| `block-commit-on-main.sh` | Blocks `git commit` while on `main`/`master`/`trunk`. Override with `CLAUDE_ALLOW_MAIN_WORK=1`. |
+| `block-commit-on-main.sh` | Blocks `git commit` while on `main`/`master`/`trunk`. Override with `CLAUDE_ALLOW_MAIN_WORK=1`. At user-level installs the per-repo scope is configurable — see [Main-branch guard scope](#main-branch-guard-scope). |
 | `block-merge-on-red-ci.sh` | Blocks `gh pr merge` when required CI checks aren't green. Configure required checks via `GIT_WORKFLOW_REQUIRED_CHECKS` (default: empty → hook is a no-op). Override with `CLAUDE_ALLOW_RED_MERGE=1`. |
 | `warn-on-pr-merge.sh` | Warns (does not block) when the agent invokes `gh pr merge`. Reminder that "merging is a human action" — agents hand off, humans land. Pairs with `block-merge-on-red-ci.sh`, which still hard-blocks the unsafe case. |
 
@@ -83,7 +83,7 @@ PreToolUse on `Edit|Write|MultiEdit|NotebookEdit`:
 
 | Hook | What it does |
 |---|---|
-| `block-edits-on-main-or-root.sh` | Blocks edits while on `main`/`master`/`trunk` or while CWD is the root worktree. Allows edits whose target file path lives in a sibling worktree. Override with `CLAUDE_ALLOW_MAIN_WORK=1`. |
+| `block-edits-on-main-or-root.sh` | Blocks edits while on `main`/`master`/`trunk` or while CWD is the root worktree. Allows edits whose target file path lives in a sibling worktree. Override with `CLAUDE_ALLOW_MAIN_WORK=1`. At user-level installs the per-repo scope is configurable — see [Main-branch guard scope](#main-branch-guard-scope). |
 
 PostToolUse on `Bash`:
 
@@ -150,6 +150,38 @@ Claude settings) to tune behavior:
 | `CLAUDE_ALLOW_MAIN_WORK` | unset | When `1`, suppresses `block-commit-on-main` and `block-edits-on-main-or-root`. Use sparingly (e.g., a trivial fix when CI is broken). `CLAUDE_ALLOW_MAIN_COMMIT=1` is accepted as a legacy alias for the commit hook only. |
 | `CLAUDE_ALLOW_RED_MERGE` | unset | When `1` (typically as an inline assignment, e.g. `CLAUDE_ALLOW_RED_MERGE=1 gh pr merge 42`), suppresses `block-merge-on-red-ci` for one command. Use only when a failing check is genuinely unrelated infra. |
 | `CLAUDE_CODE_REMOTE` | _(set automatically by Claude Code on the web)_ | When `true`, the worktree-aware hooks (`block-checkout-on-root`, `block-commit-on-main`, `block-edits-on-main-or-root`) skip — there are no worktrees in the web environment, so the guards would only produce false positives. |
+
+### Main-branch guard scope
+
+The two main-branch guards (`block-commit-on-main` and `block-edits-on-main-or-root`) apply everywhere by default. If you've installed the plugin at the **user** level but only want the guards in some repos, list those repos in:
+
+```
+$XDG_CONFIG_HOME/git-workflow-guards/main-guard-repos
+# falls back to $HOME/.config/git-workflow-guards/main-guard-repos
+```
+
+One entry per line. Blank lines and `#`-comments are ignored.
+
+| Entry form | Matches |
+|---|---|
+| Bare name (no `/`) | Repo basename. A trailing `.git` is stripped from the basename before comparison, so `myproj` matches both `myproj` and `myproj.git`. |
+| Absolute path or `~/`-prefixed path | Canonical repo root (resolved with `pwd -P`). Use this to disambiguate two repos with the same basename in different directories. Relative paths are **not** supported and silently skipped — their meaning would depend on the hook's invocation directory. Only `~/` is expanded; `~otheruser/` is not supported and the hook will emit a stderr warning for such entries. |
+
+Semantics:
+
+- File missing or empty → guards apply everywhere (backwards-compatible).
+- File present with entries → guards apply only to listed repos at user-level installs.
+- If **any** entry matches (bare name or path), the repo is in scope.
+- **Project-level installs ignore this file** and always apply — the act of committing the plugin into the repo is the opt-in.
+
+Example:
+
+```
+# ~/.config/git-workflow-guards/main-guard-repos
+book-analyzer-v4
+~/work/infra            # absolute path — disambiguates from ~/personal/infra
+/Users/me/code/special  # also fine: any absolute path works
+```
 
 ## What's intentionally *not* in scope
 
