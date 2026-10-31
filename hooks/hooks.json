@@ -7,7 +7,6 @@
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/strip-redundant-git-C.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/simplify-git-push.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/warn-no-verify-push.sh" },
-          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/ban-gh-api-comments.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-delete-branch-in-worktree.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/warn-amend-pushed-commits.sh" },
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-blanket-git-add.sh" },
