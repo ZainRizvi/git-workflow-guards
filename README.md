@@ -71,7 +71,6 @@ PreToolUse on `Bash`:
 | `strip-redundant-git-C.sh` | Denies `git -C <dir>`. Use `cd`/`pushd` instead. |
 | `simplify-git-push.sh` | Rewrites `git push -u origin <current>` → `git push`. |
 | `warn-no-verify-push.sh` | Blocks `git push --no-verify` unless the command also includes `--bypass`. |
-| `ban-gh-api-comments.sh` | Rewrites `gh api repos/.../{pulls,issues}/N/comments` to the friendlier `gh pr/issue view N --comments`. |
 | `block-delete-branch-in-worktree.sh` | Strips `--delete-branch` from `gh pr merge` when CWD is a worktree (deleting would break the worktree checkout). |
 | `warn-amend-pushed-commits.sh` | Blocks `git commit --amend` when HEAD is already on the remote (would force a push). |
 | `block-blanket-git-add.sh` | Blocks `git add -A`, `git add .`, `git commit -a/-am`. List paths explicitly. |
